@@ -105,7 +105,7 @@ fn main(){
 
     // TODO: remove the magic number for scaling
     // Check winit's monitor methods or the dpi crate
-    println!("The screen has {:.0}x{:.0} pixels", w * 1.25, h * 1.25); // Windows Scaled at 125%
+    println!("The screen has {:.0}x{:.0} pixels.", w * 1.25, h * 1.25); // Windows Scaled at 125%
     if let Err(error) = listen(callback) {
         println!("Error: {:?}", error)
     }
