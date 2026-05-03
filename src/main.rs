@@ -1,67 +1,75 @@
 mod grid_map;
+mod overlay;
+mod softbuffer_test;
 
 use std::collections::HashSet;
-use std::mem::swap;
 use std::sync::{Mutex, OnceLock};
 use rdev::{Event, listen, EventType, Key, display_size};
+use winit::event_loop::EventLoop;
 use crate::AppMode::{Monitoring, Navigating};
 use crate::grid_map::GridEngine;
+use crate::overlay::OverlayApp;
+use std::sync::mpsc::{self, Sender, Receiver};
 
-// TODO: REMOVE!
-// Check winit's monitor methods or the dpi crate
-const magic_scaling_number: f32 = 1.25;
-
-enum AppMode{
-    Monitoring,
-    Navigating
+#[derive(Debug, Clone)]
+pub enum OverlayCommand {
+    Show,
+    Hide,
 }
 
+// Global channel sender (rdev thread -> winit main thread)
+static OVERLAY_TX: OnceLock<Sender<OverlayCommand>> = OnceLock::new();
 
-struct AppState{
+enum AppMode {
+    Monitoring,
+    Navigating,
+}
+
+struct AppState {
     keys_history: Vec<Key>,
     keys_current: HashSet<Key>,
-    app_mode:AppMode,
+    app_mode: AppMode,
     grid_engine: GridEngine
 }
 
 static STATE: OnceLock<Mutex<AppState>> = OnceLock::new();
 
-fn get_state() -> &'static Mutex <AppState> {
+fn get_state() -> &'static Mutex<AppState> {
     STATE.get_or_init(|| {
         let (w, h) = display_size().unwrap();
-
-        let w = w as f32;
-        let h = h as f32;
-        Mutex::new(AppState{
+        Mutex::new(AppState {
             keys_history: Vec::new(),
             keys_current: HashSet::new(),
-            app_mode:Monitoring,
-
-            grid_engine: GridEngine::new(w * magic_scaling_number, h * magic_scaling_number)
+            app_mode: Monitoring,
+            // Use logical size for now; rdev::simulate works with these coordinates (on my machine at least)
+            grid_engine: GridEngine::new(w as f32, h as f32),
         })
     })
 }
 
-fn handle_monitoring(event: Event, state: &mut AppState){
+fn handle_monitoring(event: Event, state: &mut AppState) {
     match event.event_type {
         EventType::KeyPress(key) => {
             state.keys_current.insert(key);
             state.keys_history.push(key);
-
             state.keys_history.dedup();
+
             if state.keys_history.len() >= 2 {
                 let last = state.keys_history.last().unwrap();
                 let second_to_last = state.keys_history.get(state.keys_history.len() - 2).unwrap();
 
                 if *second_to_last == Key::Alt && *last == Key::ControlLeft {
                     state.app_mode = Navigating;
-                    println!("Overlay Opened");
                     state.keys_history.clear();
                     state.keys_current.clear();
+
+                    // Send Show command to overlay
+                    if let Some(tx) = OVERLAY_TX.get() {
+                        let _ = tx.send(OverlayCommand::Show);
+                    }
                 }
             }
         }
-
         EventType::KeyRelease(key) => {
             state.keys_current.remove(&key);
             state.keys_history.clear();
@@ -77,42 +85,37 @@ fn handle_navigation(event: Event, state: &mut AppState) {
             state.keys_current.insert(key);
             state.keys_history.push(key);
 
-            println!("DEBUG: A key has been pressed key history: {:?}", state.keys_history);
-            
             if state.keys_history.len() >= 2 {
-                println!("DEBUG: Two keys in history, attempting to get their coords");
-                let col_selector_key = state.keys_history[0];
-                let row_selector_key = state.keys_history[1];
+                let col_key = state.keys_history[0];
+                let row_key = state.keys_history[1];
 
-                if let Some((x, y)) = state.grid_engine.get_coords(col_selector_key, row_selector_key) {
+                if let Some((x, y)) = state.grid_engine.get_coords(col_key, row_key) {
+                    // Simulate mouse move on a separate thread (rdev::simulate can block)
                     std::thread::spawn(move || {
-                        let actual_x = x / magic_scaling_number;
-                        let actual_y = y / magic_scaling_number;
-                        if let Err(e) = rdev::simulate(&EventType::MouseMove { x: actual_x as f64, y: actual_y as f64 }) {
+                        if let Err(e) = rdev::simulate(&EventType::MouseMove { x: x as f64, y: y as f64 }) {
                             eprintln!("Failed to simulate mouse move: {:?}", e);
-                        } else {
-                            println!("Moved to: {}, {}", x, y);
                         }
                     });
-                } else {
-                    println!("Invalid Grid Selection!");
                 }
 
-                println!("DEBUG: Attempt finished successfully");
-
+                // Reset state and hide overlay
                 state.keys_current.clear();
                 state.keys_history.clear();
                 state.app_mode = Monitoring;
-                println!("Overlay Closed");
+
+                if let Some(tx) = OVERLAY_TX.get() {
+                    let _ = tx.send(OverlayCommand::Hide);
+                }
             }
         }
-
         EventType::KeyRelease(key) => {
             state.keys_current.remove(&key);
             if key == Key::Escape {
                 state.keys_history.clear();
                 state.app_mode = Monitoring;
-                println!("Overlay Closed");
+                if let Some(tx) = OVERLAY_TX.get() {
+                    let _ = tx.send(OverlayCommand::Hide);
+                }
             }
         }
         _ => {}
@@ -122,31 +125,31 @@ fn handle_navigation(event: Event, state: &mut AppState) {
 fn callback(event: Event) {
     let mut state = get_state().lock().unwrap();
     match state.app_mode {
-        Monitoring => {
-            // Monitoring Mode
-            // Listen for Alt + Ctrl
-            handle_monitoring(event, &mut state);
-        }
-        Navigating => {
-            // Navigation Mode
-            // Capture keys into Vec for grid selection
-            // If Escape, set is_overlay_visible = false
-            handle_navigation(event, &mut state);
-        }
-        _ => {}
+        Monitoring => handle_monitoring(event, &mut state),
+        Navigating => handle_navigation(event, &mut state),
     }
 }
 
-fn main(){
-    let (w, h) = display_size().unwrap();
+fn main() {
+    // softbuffer_test::run_softbuffer_test();
+    // return;
 
-    let w = w as f32;
-    let h = h as f32;
+    // Create command channel
+    let (tx, rx) = mpsc::channel();
+    OVERLAY_TX.set(tx).unwrap();
 
-    println!("The screen has {:.0}x{:.0} pixels", w * magic_scaling_number, h * magic_scaling_number); // Windows Scaled at 125%
-    if let Err(error) = listen(callback) {
-        println!("Error: {:?}", error)
-    }
+    // Create winit event loop and overlay app
+    // !! main thread
+    let event_loop = EventLoop::new().expect("Failed to create event loop");
+    let mut overlay_app = OverlayApp::new(rx);
+
+    // Spawn rdev listener in background thread
+    std::thread::spawn(|| {
+        if let Err(e) = listen(callback) {
+            eprintln!("rdev error: {:?}", e);
+        }
+    });
+
+    // Run winit loop on main thread (required for window creation, winit is picky)
+    event_loop.run_app(&mut overlay_app).expect("Event loop failed");
 }
-
-// TODO: Alt+Ctrl might mess up stuff in the current app the user has open. Find a way to fix it, or just put up a disclaimer
