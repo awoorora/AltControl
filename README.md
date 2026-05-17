@@ -20,13 +20,13 @@ PowerShell - `Start-Process -WindowStyle Hidden -FilePath "[your file path]\altc
 
 ## How to Use
 
-1. **Launch** the app — it runs silently in the background
-2. **Press `Alt+Left Ctrl`** — the overlay appears with a grid
+1. **Launch** the app - it runs silently in the background
+2. **Press `Alt+Left Ctrl`** - the overlay appears with a grid
 3. Type **two keys**:
    - **First**: A column key from the middle keyboard row: `A S D F G H J K L ;`
    - **Second**: Any row key from the full QWERTY layout: `Q W E R T Y U I O P A S ... N M , . /`
 1. Watch your mouse **snap** to the center of the selected cell
-2. Overlay closes **automatically** — return to your work
+2. Overlay closes **automatically** - return to your work
 
 ### Example Sequences
 | Keys      | Result                                |
