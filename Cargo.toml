@@ -8,3 +8,8 @@ rdev = "0.5.3"
 winit = "0.30"
 softbuffer = "0.4"
 rusttype = "0.9"
+
+[[bin]]
+name = "altctrl"
+path = "src/main.rs"
+windows_subsystem = "windows"
