@@ -1,9 +1,9 @@
-# AltCtrl — Keyboard-Driven Mouse Navigation
+# AltCtrl - Keyboard-Driven Mouse Navigation
 
 [![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A lightweight, always-on-top overlay that lets you navigate your entire screen without touching the mouse. Press `Alt+Left Ctrl` to summon a labeled 10×30 grid, then type up to three keys to place the cursor with increasing precision — then optionally click, all from the keyboard.
+A lightweight, always-on-top overlay that lets you navigate your entire screen without touching the mouse. Press `Alt+Left Ctrl` to summon a labeled 10×30 grid, then type up to three keys to place the cursor with increasing precision - then optionally click, all from the keyboard.
 
 ## Quick Start
 
@@ -20,15 +20,15 @@ https://youtu.be/dDK0VC_prtA
 - **Global Hotkey**: Press `Alt+Left Ctrl` anywhere to open the overlay
 - **Visual Grid**: Color-coded 10×30 grid with every cell labeled by its key combo
 - **Progressive Precision**: Column → cell → left/right third, with the mouse moving at each step so you always see where you're headed
-- **Click Simulation**: `Left Ctrl` for left click, `Alt` for right click — usable at any point in the sequence
+- **Click Simulation**: `Left Ctrl` for left click, `Alt` for right click - usable at any point in the sequence
 - **No Key Leakage**: All keypresses while the overlay is open are captured and never reach background apps
 - **Auto DPI Detection**: Adapts to your display's resolution and scale factor automatically
 - **Crisp Rendering**: Anti-aliased labels and grid lines via softbuffer
 
 ## How to Use
 
-1. **Launch** the app — it runs silently in the background
-2. **Press `Alt+Left Ctrl`** — the overlay appears over your entire screen
+1. **Launch** the app - it runs silently in the background
+2. **Press `Alt+Left Ctrl`** - the overlay appears over your entire screen
 3. **Press a column key** from the home row: `A S D F G H J K L ;`
    - The mouse moves to the **center of that column**
 4. **Press a row key** from anywhere on the keyboard: `Q W E R T Y U I O P` / `A S D F G H J K L ;` / `Z X C V B N M , . /`
@@ -57,7 +57,7 @@ The overlay closes automatically after a click.
 
 ### Grid Layout
 
-**Columns (10):** `A S D F G H J K L ;` — left to right across the screen  
+**Columns (10):** `A S D F G H J K L ;` - left to right across the screen  
 **Rows (30):** QWERTY row (0–9) → ASDF row (10–19) → ZXCV row (20–29)  
 Each cell is 1/10th of screen width × 1/30th of screen height.
 
@@ -90,7 +90,7 @@ rusttype = "0.9"    # Font rasterization
 
 ## Configuration
 
-No config file needed — display resolution is detected automatically at runtime. To tweak rendering, edit these values near the top of `src/overlay.rs`:
+No config file needed - display resolution is detected automatically at runtime. To tweak rendering, edit these values near the top of `src/overlay.rs`:
 
 ```rust
 font_px: 25.0,  // label size
@@ -100,12 +100,12 @@ let column_colors = [0xf86565, 0xffc766, 0xe6ff66, 0x68ff66, 0x66f7ff];  // 0xRR
 
 ## Privacy & Security
 
-- **No telemetry** — nothing is collected or transmitted
-- **Local only** — all input simulation happens on your machine
-- **Open source** — full source is here; no hidden behavior
-- **No elevated privileges** — standard input APIs only, no admin/root required on most systems
+- **No telemetry** - nothing is collected or transmitted
+- **Local only** - all input simulation happens on your machine
+- **Open source** - full source is here; no hidden behavior
+- **No elevated privileges** - standard input APIs only, no admin/root required on most systems
 
-> **Note:** On Windows, global keyboard hooks may trigger antivirus warnings. AltCtrl is safe — the source is public and builds are reproducible.
+> **Note:** On Windows, global keyboard hooks may trigger antivirus warnings. AltCtrl is safe - the source is public and builds are reproducible.
 
 ## Troubleshooting
 
@@ -115,7 +115,7 @@ let column_colors = [0xf86565, 0xffc766, 0xe6ff66, 0x68ff66, 0x66f7ff];  // 0xRR
 | Mouse moves to the wrong spot | Check your display scaling settings; custom DPI may interfere |
 | Font looks blurry | Swap in a different `.ttf` in `assets/`; adjust `font_px` in `overlay.rs` |
 | Click lands on the wrong target | Try increasing the sleep delay in `perform_click_and_close` (default: 80ms) |
-| Doesn't start on Linux | X11 only — use XWayland or switch to an X11 session if on Wayland |
+| Doesn't start on Linux | X11 only - use XWayland or switch to an X11 session if on Wayland |
 
 ## Contributing
 
@@ -129,11 +129,11 @@ Contributions welcome!
 
 ## License
 
-[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0) — see [LICENSE](./LICENSE) for the full text.
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0) - see [LICENSE](./LICENSE) for the full text.
 
 ## Acknowledgments
 
-- [winit](https://github.com/rust-windowing/winit) — cross-platform windowing
-- [rdev](https://github.com/Narsil/rdev) — global input hooks and simulation
-- [softbuffer](https://github.com/rust-windowing/softbuffer) — simple CPU-side rendering
+- [winit](https://github.com/rust-windowing/winit) - cross-platform windowing
+- [rdev](https://github.com/Narsil/rdev) - global input hooks and simulation
+- [softbuffer](https://github.com/rust-windowing/softbuffer) - simple CPU-side rendering
 - The Rust community for making systems programming approachable
