@@ -8,6 +8,12 @@ A lightweight, always-on-top overlay that lets you navigate your screen using ke
 ## Quick Start
 PowerShell - `Start-Process -WindowStyle Hidden -FilePath "[your file path]\altctrl.exe"`
 
+## Showcase
+
+https://github.com/user-attachments/assets/df3d828d-65bc-4836-a0a8-6f732241237b
+
+https://youtu.be/dDK0VC_prtA
+
 ## Features
 
 - **Global Hotkey Activation**: Press `Alt+Left Ctrl` anywhere to open the overlay
