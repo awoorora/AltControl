@@ -55,8 +55,8 @@ Each cell is 1/10th of screen width × 1/30th of screen height. Mouse lands at c
 
 ### Build from Source
 ```bash
-git clone https://github.com/yourusername/altctrl.git
-cd altctrl
+git clone https://github.com/awoorora/AltControl
+cd AltControl
 cargo build --release
 ```
 
