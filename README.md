@@ -51,7 +51,7 @@ Each cell is 1/10th of screen width × 1/30th of screen height. Mouse lands at c
 ```bash
 git clone https://github.com/yourusername/altctrl.git
 cd altctrl
-cargo build --releasez
+cargo build --release
 ```
 
 The executable will be at `target/release/altctrl.exe` (Windows) or `target/release/altctrl` (Linux/macOS).
@@ -69,7 +69,7 @@ rusttype = "0.9"    # Font rasterization
 
 ## Configuration
 
-No config file needed — AltCtrl auto-detects your display settings. Advanced users can modify constants in `src/overlay.rs`:
+No config file needed, AltCtrl auto-detects your display settings. Advanced users can modify constants in `src/overlay.rs`:
 ```rust
 // Font size (scales with resolution)
 font_px: 25.0,
