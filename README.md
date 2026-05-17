@@ -1,4 +1,7 @@
-# AltCtrl - Keyboard-Driven Mouse Navigation
+<div align="center">
+<img width="1920" height="580" alt="altctrl banner" src="https://github.com/user-attachments/assets/12fa5188-b852-4ccd-ba8e-0217a815c5ed" />
+<h1>AltCtrl - Keyboard-Driven Cursor Navigation</h1>
+</div>
 
 [![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
